@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Company</title>
+</head>
+<body>
+    <h1>Add New Company</h1>
+    <form action="{{ url_for('add_company') }}" method="post" enctype="multipart/form-data">
+
+        <label for="image">Image:</label>
+        <input type="file" id="image" name="image">
+        <br>
+
+        <label for="company_name">company name:</label>
+        <input type="text" id="company_name" name="company_name" required>
+        <br>
+
+        <label for="contact_name">Contact Name:</label>
+        <input type="text" id="contact_name" name="contact_name">
+        <br>
+
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone">
+        <br>
+
+        <label for="skills">Skills:</label>
+        <input type="text" id="skills" name="skills">
+        <br>
+
+        <label for="date_of_contact">Date of Contact:</label>
+        <input type="date" id="date_of_contact" name="date_of_contact">
+        <br>
+
+        <label for="date_start_works">Date Start Works:</label>
+        <input type="date" id="date_start_works" name="date_start_works">
+        <br>
+
+        <label for="working_time">Working Time (hours):</label>
+        <input type="number" id="working_time" name="working_time">
+        <br>
+
+        <label for="meeting">Meeting:</label>
+        <input type="date" id="meeting" name="meeting">
+        <br>
+
+        <label for="hour_met">Hour Met:</label>
+        <input type="text" id="hour_met" name="hour_met">
+        <br>
+
+        <label for="average_price">Average Price:</label>
+        <input type="number" step="0.01" id="average_price" name="average_price">
+        <br>
+
+        <label for="final_price">Final Price:</label>
+        <input type="number" step="0.01" id="final_price" name="final_price">
+        <br>
+
+        <label for="workplace">Workplace:</label>
+        <input type="text" id="workplace" name="workplace">
+        <br>
+
+        <label for="methods_of_payment">Methods of Payment:</label>
+        <input type="text" id="methods_of_payment" name="methods_of_payment">
+        <br>
+
+        <label for="work_method">Work Method:</label>
+        <input type="text" id="work_method" name="work_method">
+        <br>
+
+        <label for="quote">Quote:</label>
+        <input type="text" id="quote" name="quote">
+        <br>
+
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state">
+        <br>
+
+        <label for="online_view">Online View:</label>
+        <input type="text" id="online_view" name="online_view">
+        <br>
+
+        <label for="on_site_view">On-Site View:</label>
+        <input type="text" id="on_site_view" name="on_site_view">
+        <br>
+
+        <label for="calification">Calification:</label>
+        <input type="number" step="0.01" id="calification" name="calification">
+        <br>
+
+        <label for="link">External Link:</label>
+        <input type="url" id="link" name="link">
+        <br>
+
+        <label for="details">Details:</label>
+        <textarea id="details" name="details"></textarea>
+        <br>
+
+        <input type="submit" value="Add Company">
+    </form>
+</body>
+</html>

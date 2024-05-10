@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company List</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Company List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Contact Name</th>
+                <th>Phone</th>
+                <th>Skills</th>
+                <th>Date of Contact</th>
+                <th>Date Start Works</th>
+                <th>Working Time</th>
+                <th>Meeting</th>
+                <th>Hour Met</th>
+                <th>Average Price</th>
+                <th>Final Price</th>
+                <th>Workplace</th>
+                <th>Methods of Payment</th>
+                <th>Work Method</th>
+                <th>Quote</th>
+                <th>State</th>
+                <th>Online View</th>
+                <th>On-Site View</th>
+                <th>Calification</th>
+                <th>Link</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td><img src="{{ company.image_path }}" alt="Company Image" width="100"></td>
+                <td>{{ company.name }}</td>
+                <td>{{ company.contact_name }}</td>
+                <td>{{ company.phone }}</td>
+                <td>{{ company.skills }}</td>
+                <td>{{ company.date_of_contact }}</td>
+                <td>{{ company.date_start_works }}</td>
+                <td>{{ company.working_time }}</td>
+                <td>{{ company.meeting }}</td>
+                <td>{{ company.hour_met }}</td>
+                <td>{{ company.average_price }}</td>
+                <td>{{ company.final_price }}</td>
+                <td>{{ company.workplace }}</td>
+                <td>{{ company.methods_of_payment }}</td>
+                <td>{{ company.work_method }}</td>
+                <td>{{ company.quote }}</td>
+                <td>{{ company.state }}</td>
+                <td>{{ company.online_view }}</td>
+                <td>{{ company.on_site_view }}</td>
+                <td>{{ company.calification }}</td>
+                <td><a href="{{ company.link }}" target="_blank">External Link</a></td>
+                <td>{{ company.details }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Link to Add New Company page -->
+    <a href="{{ url_for('add_page') }}">Add New Company</a>
+</body>
+</html>
