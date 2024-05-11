@@ -39,7 +39,7 @@ def add_company():
     date_start_works = request.form['date_start_works']
     working_time = request.form['working_time']
     meeting = request.form['meeting']
-    hour_met = request.form['hour_met']
+    hour_meet = request.form['hour_meet']
     average_price = request.form['average_price']
     final_price = request.form['final_price']
     workplace = request.form['workplace']
@@ -65,7 +65,7 @@ def add_company():
         date_start_works=date_start_works,
         working_time=working_time,
         meeting=meeting,
-        hour_met=hour_met,
+        hour_meet=hour_meet,
         average_price=average_price,
         final_price=final_price,
         workplace=workplace,

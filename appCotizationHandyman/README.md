@@ -13,6 +13,7 @@
 - pip install awscli
 - python check_connectivity.py
 - -  python -m aws.check_connectivity.py
+- aws s3 ls : test conection with s3
 
 #### AWS Services
 - Video example: https://youtu.be/ExZPp58jGSo
