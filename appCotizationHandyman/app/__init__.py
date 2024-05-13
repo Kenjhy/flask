@@ -1,11 +1,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+# from flask_marshmallow import Marshmallow
+
 import os
 
-app = Flask(__name__, template_folder='../templates')
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/budget'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Corregido aquí
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+# ma = Marshmallow(app)
 
 from app import routes

@@ -8,6 +8,7 @@ class Company(db.Model):
     contact_name = db.Column(db.String(100))
     phone = db.Column(db.String(20))
     skills = db.Column(db.String(200))
+    creation_date = db.Column(db.Date, default=date.today)
     date_of_contact = db.Column(db.Date)
     date_start_works = db.Column(db.Date)
     working_time = db.Column(db.Integer)
@@ -24,7 +25,12 @@ class Company(db.Model):
     on_site_view = db.Column(db.String(50))
     calification = db.Column(db.Float)
     link = db.Column(db.String(200))
-    details = db.Column(db.String(500))
+    details = db.Column(db.Text())
 
     def __repr__(self):
         return f'<Company {self.company_name}>'
+    
+    # def __init__(self, company_name, contact_name, details):
+    #     self.company_name = company_name
+    #     self.contact_name = contact_name
+    #     self.details = details

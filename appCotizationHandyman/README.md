@@ -7,6 +7,11 @@
 - pip freeze
 - pip install psycopg2-binary
 - pip freeze > requirements.txt
+- - # Open a Python shell
+    python
+    >>> from app import db
+    >>> db.create_all()
+    >>> exit()
 - python -m database.init_db = El uso de -m hace que Python encuentre el módulo database.init_db correctamente en su contexto.
 - python run.py
 - pip install boto3
@@ -14,6 +19,9 @@
 - python check_connectivity.py
 - -  python -m aws.check_connectivity.py
 - aws s3 ls : test conection with s3
+- pip install flask-marshmallow
+- pip install marshmallow-sqlalchemy
+
 
 #### AWS Services
 - Video example: https://youtu.be/ExZPp58jGSo
@@ -128,3 +136,14 @@ response = s3.list_buckets()
 print([bucket['Name'] for bucket in response['Buckets']])
 Run this script using python check_aws.py. If your credentials are set up correctly, it will print out the list of S3 bucket names in your AWS account.
 By following these steps, you're setting up a secure environment for your application to interact with AWS services without hardcoding sensitive information into your source code. This is crucial for maintaining security and manageability of your application, especially as it grows or moves into production.
+
+
+##### Guides
+
+- https://pypi.org/
+
+##### Furture to deploiment
+
+- AWS Elastic Beanstalk,
+- S3
+- CloudFront 
