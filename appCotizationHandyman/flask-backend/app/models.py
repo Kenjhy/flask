@@ -29,8 +29,10 @@ class Company(db.Model):
 
     def __repr__(self):
         return f'<Company {self.company_name}>'
-    
-    # def __init__(self, company_name, contact_name, details):
-    #     self.company_name = company_name
-    #     self.contact_name = contact_name
-    #     self.details = details
+
+class State(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<State {self.name}>'

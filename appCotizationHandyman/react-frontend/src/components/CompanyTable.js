@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import AddCompanyModal from './AddCompanyModal';
-import EditCompanyModal from './EditCompanyModal';
+import AddCompanyModal from './modals/AddCompanyModal';
+import EditCompanyModal from './modals/EditCompanyModal';
+import { getCompanies, deleteCompany, updateCompany } from '../services/api';
+// import '../styles/ModalStyles.css'; // If you use specific styles here
 
 const CompanyTable = () => {
     const [companies, setCompanies] = useState([]);
@@ -11,7 +12,7 @@ const CompanyTable = () => {
 
     // Fetch companies from the backend
     const fetchCompanies = () => {
-        axios.get('http://localhost:5000/api/companies')
+        getCompanies()
             .then(response => {
                 setCompanies(response.data);
             })
@@ -36,7 +37,7 @@ const CompanyTable = () => {
     // Handle Delete
     const handleDelete = (id) => {
         if (window.confirm('Are you sure you want to delete this company?')) {
-            axios.delete(`http://localhost:5000/api/companies/${id}`)
+            deleteCompany(id)
                 .then(() => {
                     setCompanies(companies.filter(company => company.id !== id));
                     fetchCompanies(); //Refresh the list after deleting

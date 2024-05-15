@@ -1,8 +1,8 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import './ModalStyles.css';
-import CompanyTable from './CompanyTable';
+import logo from './assets/logo.svg';
+import './styles/App.css';
+import './styles/ModalStyles.css';
+import CompanyTable from './components/CompanyTable';
 
 
 function App() {

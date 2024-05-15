@@ -1,33 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Form } from 'react-bootstrap';
+import { updateCompany } from '../../services/api';
 
 
-const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
-    const [formData, setFormData] = useState({
-        image: '',
-        company_name: '',
-        contact_name: '',
-        phone: '',
-        skills: '',
-        date_of_contact: '',
-        date_start_works: '',
-        working_time: '',
-        meeting: '',
-        hour_meet: '',
-        average_price: '',
-        final_price: '',
-        workplace: '',
-        methods_of_payment: '',
-        work_method: '',
-        quote: '',
-        state: '',
-        online_view: '',
-        on_site_view: '',
-        calification: '',
-        link: '',
-        details: ''
-    });
+const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, updateCompanies  }) => {
+    const [formData, setFormData] = useState({ ...companyData });
+
+    useEffect(() => {
+        setFormData({ ...companyData }); // Update form data when companyData changes // This ensures the form updates when the selected company changes.
+    }, [companyData]);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -43,7 +25,7 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
         reader.onloadend = () => {
             setFormData(prevState => ({
                 ...prevState,
-                image: reader.result
+                image_base64: reader.result
             }));
         };
         reader.readAsDataURL(file);
@@ -51,22 +33,24 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        try {
-            const response = await axios.post('http://localhost:5000/api/companies', {
-                ...formData,
-                image_base64: formData.image // Send as base64
-            });
-            refreshCompanies();
-            handleClose();
-        } catch (error) {
-            console.error('Error adding company:', error);
-        }
+        updateCompany(companyData.id, {
+            ...formData,
+            image_base64: formData.image_base64 // Ensure image_base64 is sent
+        })
+        .then(response => {
+            if (response.status === 200 || response.status === 201) { 
+                updateCompanies({...companyData, ...formData}); // Call updateCompanies with the updated data
+                refreshCompanies();  // Optional, if you want to make sure that you data is synchronized
+                handleClose();
+            }
+        }).catch(error => console.error('Error updating company:', error));
+        
     };
 
     return (
         <Modal show={show} onHide={handleClose} className="custom-modal">
             <Modal.Header closeButton>
-                <Modal.Title>Add New Company</Modal.Title>
+                <Modal.Title>Edit Company</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
@@ -92,22 +76,23 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
                         { label: 'On Site View:', name: 'on_site_view', type: 'text' },
                         { label: 'Calification:', name: 'calification', type: 'number' },
                         { label: 'Link:', name: 'link', type: 'url' },
-                        { label: 'Details:', name: 'details', type: 'textarea' }                 
+                        { label: 'Details:', name: 'details', type: 'textarea' }
                     ].map(field => (
-                        <div className="custom-form-group" key={field.name}>
+                        <Form.Group key={field.name} className="custom-form-group">
                             <Form.Label>{field.label}</Form.Label>
                             <Form.Control
                                 type={field.type}
                                 name={field.name}
                                 required={field.required || false}
                                 onChange={field.changeHandler || handleInputChange}
+                                value={field.type === 'file' ? undefined : (formData[field.name] || '')}
                                 as={field.type === 'textarea' ? 'textarea' : 'input'}
                                 rows={field.type === 'textarea' ? 3 : undefined}
                             />
-                        </div>
+                        </Form.Group>
                     ))}
                     <Button variant="primary" type="submit">
-                        Add Company
+                        Update Company
                     </Button>
                 </Form>
             </Modal.Body>
@@ -115,4 +100,4 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
     );
 };
 
-export default AddCompanyModal;
+export default EditCompanyModal;

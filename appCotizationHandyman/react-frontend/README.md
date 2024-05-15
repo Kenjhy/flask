@@ -18,6 +18,14 @@
 - https://legacy.reactjs.org/docs/getting-started.html
 - https://react.dev/learn/start-a-new-react-project
 
+# Structure 
+
+- Detailed Explanation
+    /components: Contains all the React components. Modals are grouped in their subfolder to emphasize their role and reuse potential.
+    /assets: Stores static assets like images or logos which are used across the project.
+    /styles: Houses all the CSS files. You might later want to consider using a preprocessor like SASS for better management.
+    /services: Encapsulates all the logic related to external API communications or data processing functions. This is useful for separation of concerns and easier testing.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
