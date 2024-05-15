@@ -3,7 +3,7 @@
 - python -m venv venv
 - .\venv\Scripts\activate
 - pip install Flask Flask-SQLAlchemy
-- python -m pip install --upgrate pip
+- python -m pip install --upgrade pip
 - pip freeze
 - pip install psycopg2-binary
 - pip freeze > requirements.txt
@@ -21,6 +21,7 @@
 - aws s3 ls : test conection with s3
 - pip install flask-marshmallow
 - pip install marshmallow-sqlalchemy
+- pip install Flask-Cors
 
 
 #### AWS Services
@@ -36,6 +37,14 @@
 - - - [default]
 aws_access_key_id = YOUR_ACCESS_KEY_ID
 aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+
+##### Guides
+
+- https://github.com/users/Kenjhy/projects/3/views/1
+- https://pypi.org/
+- https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/config/
+- https://base64.guru/converter/decode/image
+- 
 
 ####  Step to Setting up AWS credentials
 
@@ -138,12 +147,4 @@ Run this script using python check_aws.py. If your credentials are set up correc
 By following these steps, you're setting up a secure environment for your application to interact with AWS services without hardcoding sensitive information into your source code. This is crucial for maintaining security and manageability of your application, especially as it grows or moves into production.
 
 
-##### Guides
-
-- https://pypi.org/
-
-##### Furture to deploiment
-
-- AWS Elastic Beanstalk,
-- S3
-- CloudFront 
+#

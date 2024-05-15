@@ -1,0 +1,77 @@
+.App {
+  text-align: center;
+  background-color: #282c34;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Change this to start aligning content at the top */
+  color: white;
+  padding: 20px; /* Padding around the app */
+  min-height: 100vh; /* Ensuring minimum height */
+}
+
+.App-header {
+  background-color: #282c34;
+  width: 100%; /* Header takes full width */
+  display: flex;
+  justify-content: flex-start; /* Aligns logo to the left */
+  padding: 10px 20px; /* Padding inside the header */
+}
+
+.App-logo {
+  height: 40px; /* Fixed smaller size for the logo */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.table-responsive {
+  width: 100%; /* Full width */
+  overflow-x: auto; /* Enable horizontal scrolling */
+}
+
+table {
+  font-size: 0.8rem; /* Smaller font size for table */
+}
+
+.table-responsive .table> :not(caption) > * > * {
+  padding: 0.3rem; 
+  border-bottom-width: 1px; /* Ensures consistent border line width */
+}
+
+.btn {
+  font-size: 0.7rem; /* Smaller buttons */
+  padding: 2px 5px; /* Smaller padding for buttons */
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.col-small {
+  width: 50px; /* Adjust accordingly */
+}
+
+.col-medium {
+  width: 100px; /* Adjust accordingly */
+}
+
+.col-large {
+  width: 150px; /* Adjust accordingly */
+}
+
+.col-xlarge {
+  width: 300px; /* Extra large for detailed descriptions or links */
+}
