@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect  } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { addCompany } from '../../services/api';
+import { addCompany, getStates } from '../../services/api';
 // import '../../styles/ModalStyles.css'; // Adjust path based on new location
 
 
@@ -23,13 +22,25 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
         methods_of_payment: '',
         work_method: '',
         quote: '',
-        state: '',
+        state_id: '',
         online_view: '',
         on_site_view: '',
         calification: '',
         link: '',
         details: ''
     });
+
+    const [states, setStates] = useState([]);
+
+    useEffect(() => {
+        if (show) {
+            getStates().then(response => {
+                setStates(response.data);
+                setFormData(formData => ({ ...formData, state_id: '' }));  // Set state_id to empty for default non-selection
+            });
+        }
+    }, [show]);  // Dependency on show to reload states when modal opens
+
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -92,7 +103,6 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
                         { label: 'Methods of Payment:', name: 'methods_of_payment', type: 'text' },
                         { label: 'Work Method:', name: 'work_method', type: 'text' },
                         { label: 'Quote:', name: 'quote', type: 'text' },
-                        { label: 'State:', name: 'state', type: 'text' },
                         { label: 'Online View:', name: 'online_view', type: 'text' },
                         { label: 'On Site View:', name: 'on_site_view', type: 'text' },
                         { label: 'Calification:', name: 'calification', type: 'number' },
@@ -111,6 +121,15 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
                             />
                         </div>
                     ))}
+                    <Form.Group className="custom-form-group">
+                        <Form.Label>State</Form.Label>
+                        <Form.Control as="select" name="state_id" value={formData.state_id} onChange={handleInputChange}>
+                            <option value="">Select a State</option>
+                            {states.map(state => (
+                                <option key={state.id} value={state.id}>{state.name}</option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
                     <Button variant="primary" type="submit">
                         Add Company
                     </Button>

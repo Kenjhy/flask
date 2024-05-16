@@ -21,7 +21,13 @@
 - aws s3 ls : test conection with s3
 - pip install flask-marshmallow
 - pip install marshmallow-sqlalchemy
-- pip install Flask-Cors
+- DB Migrate
+- - pip install Flask-Cors
+- - pip install Flask-Migrate
+- - flask db init
+- - flask db migrate -m "Added state model"
+- - flask db upgrade
+
 
 
 #### AWS Services

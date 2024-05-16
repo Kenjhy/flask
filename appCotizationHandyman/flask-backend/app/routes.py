@@ -2,7 +2,7 @@ import boto3
 import os
 from flask import request, jsonify
 from app import app, db
-from app.models import Company
+from app.models import Company, State
 from app.schemas import CompanySchema
 from datetime import datetime
 import re, base64, logging
@@ -46,6 +46,8 @@ def add_company():
     #Validation for required fields
     if not data.get('contact_name') or not data .get('phone'):
         return jsonify({"error": "Missing required fields: contact name and phone are required. "}), 400
+    
+    
 
     # Handle image upload
     image_url = None
@@ -72,39 +74,54 @@ def add_company():
         except Exception as e:
             logging.error("Failed to process image: %s", e)
             return jsonify({"error": "Failed to process the image.", "details": str(e)}), 500
+        
 
-    # Process other fields and create Company instance
-    new_company = Company(
-        image_path=image_url,
-        company_name=data.get('company_name', ''),
-        contact_name=data['contact_name'],
-        phone=data['phone'],
-        skills=data.get('skills',''),
-        # creation_date=datetime.strptime(data['creation_date'], '%Y-%m-%d') if data.get('creation_date') else None,
-        date_of_contact=parse_date(data.get('date_of_contact')),
-        date_start_works=parse_date(data.get('date_start_works')),
-        working_time=int(data.get('working_time', 0)) if data.get('working_time') else None,
-        meeting=parse_date(data.get('meeting')),
-        hour_meet=data['hour_meet'] if data.get('hour_meet') else None,
-        average_price=safe_float(data.get('average_price', None)),
-        final_price=safe_float(data.get('final_price', 0)),
-        workplace=data.get('workplace', ''),
-        methods_of_payment=data.get('methods_of_payment', ''),
-        work_method=data.get('work_method', ''),
-        quote=data.get('quote', ''),
-        state=data.get('state', ''),
-        online_view=data.get('online_view', ''),
-        on_site_view=data.get('on_site_view', ''),
-        calification=safe_float(data.get('calification', 0)),
-        link=data.get('link', ''),
-        details=data.get('details', '')
-    )
+    # Manejar el estado opcionalmente
+    state_id = None
+    if data.get('state_id'):
+        state = State.query.get(data['state_id'])
+        if not state:
+            return jsonify({"error": "Invalid state provided"}), 400
+        state_id = state.id
     
-    # Code to add a company, ad new company to database session and confirm
-    db.session.add(new_company)
-    db.session.commit()
-    return jsonify(company_schema.dump(new_company)), 201
-    # return company_schema.jsonify(new_company), 201 
+    try:
+    # Process other fields and create Company instance
+        new_company = Company(
+            image_path=image_url,
+            company_name=data.get('company_name', ''),
+            contact_name=data['contact_name'],
+            phone=data['phone'],
+            skills=data.get('skills',''),
+            # creation_date=datetime.strptime(data['creation_date'], '%Y-%m-%d') if data.get('creation_date') else None,
+            date_of_contact=parse_date(data.get('date_of_contact')),
+            date_start_works=parse_date(data.get('date_start_works')),
+            working_time=int(data.get('working_time', 0)) if data.get('working_time') else None,
+            meeting=parse_date(data.get('meeting')),
+            hour_meet=data['hour_meet'] if data.get('hour_meet') else None,
+            average_price=safe_float(data.get('average_price', None)),
+            final_price=safe_float(data.get('final_price', 0)),
+            workplace=data.get('workplace', ''),
+            methods_of_payment=data.get('methods_of_payment', ''),
+            work_method=data.get('work_method', ''),
+            quote=data.get('quote', ''),
+            state_id=state_id,
+            online_view=data.get('online_view', ''),
+            on_site_view=data.get('on_site_view', ''),
+            calification=safe_float(data.get('calification', 0)),
+            link=data.get('link', ''),
+            details=data.get('details', '')
+        )
+
+        
+        # Code to add a company, ad new company to database session and confirm
+        db.session.add(new_company)
+        db.session.commit()
+        return jsonify(company_schema.dump(new_company)), 201
+        # return company_schema.jsonify(new_company), 201 
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Failed to add new company: {str(e)}")
+        return jsonify({"error": "Failed to add company", "details": str(e)}), 500
 
 
 @app.route('/api/companies/<int:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -133,7 +150,7 @@ def handle_company(id):
             except Exception as e:
                 logging.error("Failed to update image: %s", e)
                 return jsonify({"error": "Failed to update the image.", "details": str(e)}), 500
-            
+         
         # Update other fields
         company.company_name = data.get('company_name', company.company_name)
         company.contact_name = data.get('contact_name', company.contact_name)
@@ -141,19 +158,28 @@ def handle_company(id):
         company.skills = data.get('skills', company.skills)
         company.date_of_contact = parse_date(data.get('date_of_contact'))
         company.date_start_works = parse_date(data.get('date_start_works'))
-        company.working_time = int(data.get('working_time', company.working_time))
+        company.working_time = int(data['working_time']) if data.get('working_time') is not None else company.working_time
         company.meeting = parse_date(data.get('meeting'))
         company.hour_meet = data.get('hour_meet', company.hour_meet)
-        company.average_price = float(data.get('average_price', company.average_price))
-        company.final_price = float(data.get('final_price', company.final_price))
+        company.average_price = float(data['average_price']) if data.get('average_price') is not None else company.average_price
+        company.final_price = float(data['final_price']) if data.get('final_price') is not None else company.final_price
         company.workplace = data.get('workplace', company.workplace)
         company.methods_of_payment = data.get('methods_of_payment', company.methods_of_payment)
         company.work_method = data.get('work_method', company.work_method)
         company.quote = data.get('quote', company.quote)
-        company.state = data.get('state', company.state)
+        # Handle state update
+        state_id = data.get('state_id')
+        if state_id:
+            state = State.query.get(state_id)
+            if not state:
+                return jsonify({"error": "Invalid state provided"}), 400
+            company.state_id = state.id
+        else:
+            company.state_id = None  # Allow null state if no state_id is provided
+
         company.online_view = data.get('online_view', company.online_view)
         company.on_site_view = data.get('on_site_view', company.on_site_view)
-        company.calification = float(data.get('calification', company.calification))
+        company.calification = float(data['calification']) if data.get('calification') is not None else company.calification
         company.link = data.get('link', company.link)
         company.details = data.get('details', company.details)
 
@@ -191,4 +217,10 @@ def delete_company(id):
         db.session.rollback()
         logging.error(f"Failed to delete company: {e}")
         return jsonify({'error': 'Failed to delete company', 'details': str(e)}), 500
+    
+
+@app.route('/api/states', methods=['GET'])
+def get_states():
+    states = State.query.all()
+    return jsonify([{'id': state.id, 'name': state.name} for state in states])
     

@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { updateCompany } from '../../services/api';
+import { updateCompany, getStates  } from '../../services/api';
 
 
 const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, updateCompanies  }) => {
     const [formData, setFormData] = useState({ ...companyData });
+    const [states, setStates] = useState([]);
 
     useEffect(() => {
-        setFormData({ ...companyData }); // Update form data when companyData changes // This ensures the form updates when the selected company changes.
-    }, [companyData]);
+        if (show) {
+            getStates().then(response => {
+                setStates(response.data);
+                // Make sure that formData is updated only if companyData has changed.
+                if (companyData) {
+                    setFormData({ ...companyData }); // Update form data when companyData changes // This ensures the form updates when the selected company changes.
+                }
+            });
+        }
+    }, [show, companyData]); // Dependencia añadida para companyData
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -71,7 +79,6 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                         { label: 'Methods of Payment:', name: 'methods_of_payment', type: 'text' },
                         { label: 'Work Method:', name: 'work_method', type: 'text' },
                         { label: 'Quote:', name: 'quote', type: 'text' },
-                        { label: 'State:', name: 'state', type: 'text' },
                         { label: 'Online View:', name: 'online_view', type: 'text' },
                         { label: 'On Site View:', name: 'on_site_view', type: 'text' },
                         { label: 'Calification:', name: 'calification', type: 'number' },
@@ -91,6 +98,15 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                             />
                         </Form.Group>
                     ))}
+                    <Form.Group className="custom-form-group">
+                        <Form.Label>State</Form.Label>
+                        <Form.Control as="select" name="state_id" value={formData.state_id || ''} onChange={handleInputChange}>
+                            <option value="">Select a State</option>
+                            {states.map(state => (
+                                <option key={state.id} value={state.id}>{state.name}</option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
                     <Button variant="primary" type="submit">
                         Update Company
                     </Button>
