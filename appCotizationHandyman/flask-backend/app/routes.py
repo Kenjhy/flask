@@ -25,6 +25,16 @@ def parse_date(date_str):
         return datetime.strptime(date_str, '%Y-%m-%d')
     except ValueError:
         return None
+    
+def parse_datetime(datetime_str):
+    """Safely parses a datetime string to a datetime object including time with timezone."""
+    if datetime_str is None:
+        return None
+    try:
+        # Parse the datetime string to include the timezone information if present
+        return datetime.fromisoformat(datetime_str)
+    except ValueError:
+        return None
 
 def safe_float(value, default=None):
     """Intenta convertir un valor a float. Retorna un valor por defecto si la conversión falla."""
@@ -92,12 +102,10 @@ def add_company():
             contact_name=data['contact_name'],
             phone=data['phone'],
             skills=data.get('skills',''),
-            # creation_date=datetime.strptime(data['creation_date'], '%Y-%m-%d') if data.get('creation_date') else None,
             date_of_contact=parse_date(data.get('date_of_contact')),
             date_start_works=parse_date(data.get('date_start_works')),
             working_time=int(data.get('working_time', 0)) if data.get('working_time') else None,
-            meeting=parse_date(data.get('meeting')),
-            hour_meet=data['hour_meet'] if data.get('hour_meet') else None,
+            meeting=parse_datetime(data.get('meeting')),
             average_price=safe_float(data.get('average_price', None)),
             final_price=safe_float(data.get('final_price', 0)),
             workplace=data.get('workplace', ''),
@@ -159,8 +167,7 @@ def handle_company(id):
         company.date_of_contact = parse_date(data.get('date_of_contact'))
         company.date_start_works = parse_date(data.get('date_start_works'))
         company.working_time = int(data['working_time']) if data.get('working_time') is not None else company.working_time
-        company.meeting = parse_date(data.get('meeting'))
-        company.hour_meet = data.get('hour_meet', company.hour_meet)
+        company.meeting = parse_datetime(data.get('meeting'))
         company.average_price = float(data['average_price']) if data.get('average_price') is not None else company.average_price
         company.final_price = float(data['final_price']) if data.get('final_price') is not None else company.final_price
         company.workplace = data.get('workplace', company.workplace)
@@ -194,7 +201,6 @@ def handle_company(id):
             db.session.delete(company)
             db.session.commit()
             logging.info(f"Company with {id} was Successfully deleted.")
-            # return jsonify({'message': 'Deleted'}), 200
             return company_schema.jsonify(company), 200
         except Exception as e:
             db.session.rollback() # Rollback the session in case of an error

@@ -13,11 +13,15 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                 setStates(response.data);
                 // Make sure that formData is updated only if companyData has changed.
                 if (companyData) {
-                    setFormData({ ...companyData }); // Update form data when companyData changes // This ensures the form updates when the selected company changes.
+                    const updatedCompanyData = {
+                        ...companyData,
+                        meeting: companyData.meeting ? new Date(companyData.meeting + 'Z').toISOString().slice(0, 16) : '' // Ensure that the date is converted to UTC and formatted for datetime-local input,  datetime-local
+                    };
+                    setFormData(updatedCompanyData);
                 }
             });
         }
-    }, [show, companyData]); // Dependencia añadida para companyData
+    }, [show, companyData]);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -71,7 +75,7 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                         { label: 'Date of Contact:', name: 'date_of_contact', type: 'date' },
                         { label: 'Date Start Works:', name: 'date_start_works', type: 'date' },
                         { label: 'Working Time:', name: 'working_time', type: 'number' },
-                        { label: 'Meeting:', name: 'meeting', type: 'date' },
+                        { label: 'Meeting:', name: 'meeting', type: 'datetime-local' },
                         { label: 'Hour Met:', name: 'hour_meet', type: 'text' },
                         { label: 'Average Price:', name: 'average_price', type: 'number' },
                         { label: 'Final Price:', name: 'final_price', type: 'number' },

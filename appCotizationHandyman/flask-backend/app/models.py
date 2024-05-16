@@ -1,5 +1,4 @@
 from app import db
-from datetime import datetime, date
 
 class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,8 +11,7 @@ class Company(db.Model):
     date_of_contact = db.Column(db.Date)
     date_start_works = db.Column(db.Date)
     working_time = db.Column(db.Integer)
-    meeting = db.Column(db.Date)
-    hour_meet = db.Column(db.String(10))
+    meeting = db.Column(db.DateTime)
     average_price = db.Column(db.Float)
     final_price = db.Column(db.Float)
     workplace = db.Column(db.String(100))

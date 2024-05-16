@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AddCompanyModal from './modals/AddCompanyModal';
 import EditCompanyModal from './modals/EditCompanyModal';
-import { getCompanies, deleteCompany, updateCompany } from '../services/api';
+import { getCompanies, deleteCompany } from '../services/api';
 // import '../styles/ModalStyles.css'; // If you use specific styles here
 
 const CompanyTable = () => {
@@ -58,7 +58,6 @@ const CompanyTable = () => {
             <td>{company.date_start_works}</td>
             <td>{company.working_time}</td>
             <td>{company.meeting}</td>
-            <td>{company.hour_meet}</td>
             <td>{company.average_price}</td>
             <td>{company.final_price}</td>
             <td>{company.workplace}</td>
@@ -107,7 +106,6 @@ const CompanyTable = () => {
                         <th className="col-medium">Date Start Works</th>
                         <th className="col-medium">Working Time</th>
                         <th className="col-medium">Meeting</th>
-                        <th className="col-small">Hour Met</th>
                         <th className="col-medium">Average Price</th>
                         <th className="col-medium">Final Price</th>
                         <th className="col-large">Workplace</th>
