@@ -5,6 +5,7 @@
 - npm install axios
 - npm install bootstrap
 - npm install react-bootstrap
+- Remove-Item -Path node_modules, package-lock.json -Recurse -Force
 
 
 
