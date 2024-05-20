@@ -1,5 +1,8 @@
 from app import db, app
-from app.models import State, Rating
+from app.models.state_model import State
+from app.models.rating_model import Rating
+# from app.models import State, Rating
+
 
 # Crear un contexto de aplicación
 def init_db():

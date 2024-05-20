@@ -29,17 +29,3 @@ class Company(db.Model):
 
     def __repr__(self):
         return f'<Company {self.company_name}>'
-
-class State(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<State {self.name}>'
-    
-class Rating(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    classification = db.Column(db.String(50), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<Rating {self.classification}>'

@@ -1,7 +1,11 @@
 from flask import request, jsonify
 from app import db
-from app.models import Company, State, Rating
-from app.schemas import CompanySchema
+# from app.models import Company, State, Rating
+from app.models.company_model import Company
+from app.models.state_model import State
+from app.models.rating_model import Rating
+# from app.schemas import CompanySchema
+from app.schemas.company_schema import CompanySchema
 import boto3
 import base64
 import re
