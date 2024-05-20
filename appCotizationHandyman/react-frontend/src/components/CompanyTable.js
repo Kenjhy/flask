@@ -64,10 +64,10 @@ const CompanyTable = () => {
             <td>{company.methods_of_payment}</td>
             <td>{company.work_method}</td>
             <td>{company.quote}</td>
-            <td>{company.state}</td>
+            <td>{company.state ? company.state.name : 'N/A'}</td>  {/* Ensure state name is displayed */}
             <td>{company.online_view}</td>
             <td>{company.on_site_view}</td>
-            <td>{company.calification}</td>
+            <td>{company.rating ? company.rating.classification : 'N/A'}</td>
             <td><a href={company.link} target="_blank" rel="noopener noreferrer">Link</a></td>
             <td>{company.details}</td>
             <td>
@@ -115,7 +115,7 @@ const CompanyTable = () => {
                         <th className="col-medium">State</th>
                         <th className="col-medium">Online View</th>
                         <th className="col-medium">On-Site View</th>
-                        <th className="col-medium">Calification</th>
+                        <th className="col-medium">Rating</th>
                         <th className="col-xlarge">Link</th>
                         <th className="col-xlarge">Details</th>
                         <th className="col-large">Actions</th>

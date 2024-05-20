@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { updateCompany, getStates  } from '../../services/api';
+import { updateCompany, getStates, getRatings } from '../../services/api';
 
 
 const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, updateCompanies  }) => {
     const [formData, setFormData] = useState({ ...companyData });
     const [states, setStates] = useState([]);
+    const [ratings, setRatings] = useState([]);
 
     useEffect(() => {
         if (show) {
@@ -15,9 +16,19 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                 if (companyData) {
                     const updatedCompanyData = {
                         ...companyData,
-                        meeting: companyData.meeting ? new Date(companyData.meeting + 'Z').toISOString().slice(0, 16) : '' // Ensure that the date is converted to UTC and formatted for datetime-local input,  datetime-local
+                        meeting: companyData.meeting ? new Date(companyData.meeting + 'Z').toISOString().slice(0, 16) : '', // Ensure that the date is converted to UTC and formatted for datetime-local input,  datetime-local
+                        state_id: companyData.state_id || ''  // Make sure to set state_id, might be undefined
                     };
                     setFormData(updatedCompanyData);
+                }
+            });
+            getRatings().then(response => {
+                setRatings(response.data);
+                if (companyData) {
+                    setFormData(formData => ({
+                        ...formData,
+                        rating_id: companyData.rating_id || ''
+                    }));
                 }
             });
         }
@@ -76,7 +87,6 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                         { label: 'Date Start Works:', name: 'date_start_works', type: 'date' },
                         { label: 'Working Time:', name: 'working_time', type: 'number' },
                         { label: 'Meeting:', name: 'meeting', type: 'datetime-local' },
-                        { label: 'Hour Met:', name: 'hour_meet', type: 'text' },
                         { label: 'Average Price:', name: 'average_price', type: 'number' },
                         { label: 'Final Price:', name: 'final_price', type: 'number' },
                         { label: 'Workplace:', name: 'workplace', type: 'text' },
@@ -85,7 +95,6 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                         { label: 'Quote:', name: 'quote', type: 'text' },
                         { label: 'Online View:', name: 'online_view', type: 'text' },
                         { label: 'On Site View:', name: 'on_site_view', type: 'text' },
-                        { label: 'Calification:', name: 'calification', type: 'number' },
                         { label: 'Link:', name: 'link', type: 'url' },
                         { label: 'Details:', name: 'details', type: 'textarea' }
                     ].map(field => (
@@ -108,6 +117,15 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                             <option value="">Select a State</option>
                             {states.map(state => (
                                 <option key={state.id} value={state.id}>{state.name}</option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                    <Form.Group className="custom-form-group">
+                        <Form.Label>Rating</Form.Label>
+                        <Form.Control as="select" name="rating_id" value={formData.rating_id || ''} onChange={handleInputChange}>
+                            <option value="">Select a Rating</option>
+                            {ratings.map(rating => (
+                                <option key={rating.id} value={rating.id}>{rating.classification}</option>
                             ))}
                         </Form.Control>
                     </Form.Group>

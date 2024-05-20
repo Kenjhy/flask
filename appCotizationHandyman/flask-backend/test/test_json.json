@@ -8,7 +8,6 @@
 "date_start_works": "2024-05-15",
 "working_time": 120,
 "meeting": "2024-05-10",
-"hour_meet": "14:00",
 "average_price": 5000.50,
 "final_price": 4500.00,
 "workplace": "1234 Main St, Anytown, USA",
@@ -18,7 +17,6 @@
 "state": "Confirmed",
 "online_view": "Available",
 "on_site_view": "Required",
-"calification": 4.5,
 "link": "http://example.com/profile/handyman-solutions",
 "details": "Complete renovation services including plumbing, electrical work, and carpentry."
 }

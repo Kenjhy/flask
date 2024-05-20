@@ -1,12 +1,14 @@
-import boto3
-import os
 from flask import request, jsonify
-from app import app, db
-from app.models import Company, State
+from app import db
+from app.models import Company, State, Rating
 from app.schemas import CompanySchema
-from datetime import datetime
-import re, base64, logging
+import boto3
+import base64
+import re
+import logging
 from io import BytesIO
+from datetime import datetime
+from . import company_bp
 
 company_schema = CompanySchema()
 companies_schema = CompanySchema(many=True)
@@ -16,6 +18,7 @@ logging.basicConfig(level=logging.INFO)
 
 #Initialize SE client
 s3 = boto3.client('s3')
+
 
 """Safely parses a date string to a datetime object."""
 def parse_date(date_str):
@@ -37,18 +40,19 @@ def parse_datetime(datetime_str):
         return None
 
 def safe_float(value, default=None):
-    """Intenta convertir un valor a float. Retorna un valor por defecto si la conversión falla."""
+    """Try to convert a value to float. Return a default value if the conversion fails."""
     try:
         return float(value)
     except (TypeError, ValueError):
         return default
+    
 
-@app.route('/api/companies', methods=['GET'])
+@company_bp.route('/companies', methods=['GET'], strict_slashes=False)
 def get_companies():
     companies = Company.query.all()
     return jsonify(companies_schema.dump(companies))
 
-@app.route('/api/companies', methods=['POST'])
+@company_bp.route('/companies', methods=['POST'], strict_slashes=False)
 def add_company():
     # Code to handle company addition, including image handling as before
     # Assume that the requst contains a JSON with the necessary data
@@ -93,6 +97,13 @@ def add_company():
         if not state:
             return jsonify({"error": "Invalid state provided"}), 400
         state_id = state.id
+
+    rating_id = None
+    if data.get('rating_id'):
+        rating = Rating.query.get(data['rating_id'])
+        if not rating:
+            return jsonify({"error": "Invalid rating provided"}), 400
+        rating_id = rating.id
     
     try:
     # Process other fields and create Company instance
@@ -115,12 +126,11 @@ def add_company():
             state_id=state_id,
             online_view=data.get('online_view', ''),
             on_site_view=data.get('on_site_view', ''),
-            calification=safe_float(data.get('calification', 0)),
+            rating_id=rating_id,
             link=data.get('link', ''),
             details=data.get('details', '')
         )
 
-        
         # Code to add a company, ad new company to database session and confirm
         db.session.add(new_company)
         db.session.commit()
@@ -132,7 +142,7 @@ def add_company():
         return jsonify({"error": "Failed to add company", "details": str(e)}), 500
 
 
-@app.route('/api/companies/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@company_bp.route('/companies/<int:id>', methods=['GET', 'PUT', 'DELETE'], strict_slashes=False)
 def handle_company(id):
     company = Company.query.get_or_404(id)
     if request.method == 'GET':
@@ -183,10 +193,19 @@ def handle_company(id):
             company.state_id = state.id
         else:
             company.state_id = None  # Allow null state if no state_id is provided
-
+            
         company.online_view = data.get('online_view', company.online_view)
         company.on_site_view = data.get('on_site_view', company.on_site_view)
-        company.calification = float(data['calification']) if data.get('calification') is not None else company.calification
+
+        rating_id = data.get('rating_id')
+        if rating_id:
+            rating = Rating.query.get(rating_id)
+            if not rating:
+                return jsonify({"error": "Invalid rating provided"}), 400
+            company.rating_id = rating.id
+        else:
+            company.rating_id = None
+            
         company.link = data.get('link', company.link)
         company.details = data.get('details', company.details)
 
@@ -200,33 +219,27 @@ def handle_company(id):
         try:    
             db.session.delete(company)
             db.session.commit()
-            logging.info(f"Company with {id} was Successfully deleted.")
-            return company_schema.jsonify(company), 200
+            logging.info(f"Company with {id} was successfully deleted.")
+            return jsonify({'message': 'Company successfully deleted.'}), 200
         except Exception as e:
             db.session.rollback() # Rollback the session in case of an error
             logging.error(f"Failed to delete Company with {id}: {str(e)}")
             return jsonify({'error': 'Failed to delete company', 'details': str(e)}), 500 
     
 
-@app.route('/api/companies_soft/<int:id>', methods=['DELETE'])
-def delete_company(id):
-    company = Company.query.get(id)
-    if company is None:
-        return jsonify({'message': 'Company not found'}), 404
+@company_bp.route('/company_routes/soft_delete/<int:id>', methods=['DELETE'], strict_slashes=False)
+def soft_delete_company(id):
+    company = Company.query.get_or_404(id)
+    inactive_state = State.query.filter_by(name='Inactive').first()
+
+    if not inactive_state:
+        return jsonify({"error": "Inactive state not found"}), 500
 
     try:
-        # Soft delete example
-        company.is_active = False  # Assuming there's an 'is_active' column
+        company.state_id = inactive_state.id
         db.session.commit()
-        return jsonify({'message': 'Company successfully deleted'}), 200
+        return jsonify({'message': 'Company successfully soft deleted'}), 200
     except Exception as e:
         db.session.rollback()
-        logging.error(f"Failed to delete company: {e}")
-        return jsonify({'error': 'Failed to delete company', 'details': str(e)}), 500
-    
-
-@app.route('/api/states', methods=['GET'])
-def get_states():
-    states = State.query.all()
-    return jsonify([{'id': state.id, 'name': state.name} for state in states])
-    
+        logging.error(f"Failed to soft delete company: {e}")
+        return jsonify({'error': 'Failed to soft delete company', 'details': str(e)}), 500

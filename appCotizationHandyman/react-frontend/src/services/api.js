@@ -22,3 +22,7 @@ export const updateCompany = (id, companyData) => {
 export const getStates = () => {
     return axios.get(`${API_URL}/states`);
 };
+
+export const getRatings = () => {
+    return axios.get(`${API_URL}/ratings`);
+};

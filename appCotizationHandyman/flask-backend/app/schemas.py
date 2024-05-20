@@ -1,30 +1,29 @@
 from flask_marshmallow import Marshmallow
 from app import app
-from app.models import Company
+from app.models import Company, State, Rating
 
 ma = Marshmallow(app)
 
+class StateSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = State
+        load_instance = True
+
+class RatingSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Rating
+        load_instance = True
+
 class CompanySchema(ma.SQLAlchemyAutoSchema):
+    state = ma.Nested(StateSchema)
+    rating = ma.Nested(RatingSchema)
+
     class Meta:
         model = Company
         load_instance = True
+        include_fk = True  # Include foreign keys in the serialization
+        include_relationships = True  # Explicitly include relationship data
 
 
 def init_app(app):
     ma.init_app(app)
-
-
-# class CompanySchema(ma.Schema):
-#     class Meta:
-#         fields=('id','image_path','company_name',
-#                 'contact_name','phone','skills',
-#                 'creation_date','date_of_contact',
-#                 'date_start_works','working_time',
-#                 'meeting','hour_meet','average_price',
-#                 'final_price','workplace','methods_of_payment',
-#                 'work_method','quote','state',
-#                 'online_view','on_site_view','calification',
-#                 'link','details')
-        
-# companySchema = CompanySchema()
-# companySchema = CompanySchema(many=True)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect  } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { addCompany, getStates } from '../../services/api';
+import { addCompany, getStates, getRatings  } from '../../services/api';
 // import '../../styles/ModalStyles.css'; // Adjust path based on new location
 
 
@@ -15,7 +15,6 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
         date_start_works: '',
         working_time: '',
         meeting: '',
-        hour_meet: '',
         average_price: '',
         final_price: '',
         workplace: '',
@@ -25,18 +24,23 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
         state_id: '',
         online_view: '',
         on_site_view: '',
-        calification: '',
+        rating_id: '',
         link: '',
         details: ''
     });
 
     const [states, setStates] = useState([]);
+    const [ratings, setRatings] = useState([]);
 
     useEffect(() => {
         if (show) {
             getStates().then(response => {
                 setStates(response.data);
                 setFormData(formData => ({ ...formData, state_id: '' }));  // Set state_id to empty for default non-selection
+            });
+            getRatings().then(response => {
+                setRatings(response.data);
+                setFormData(formData => ({ ...formData, rating_id: '' }));
             });
         }
     }, [show]);  // Dependency on show to reload states when modal opens
@@ -126,6 +130,15 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
                             <option value="">Select a State</option>
                             {states.map(state => (
                                 <option key={state.id} value={state.id}>{state.name}</option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                    <Form.Group className="custom-form-group">
+                        <Form.Label>Rating</Form.Label>
+                        <Form.Control as="select" name="rating_id" value={formData.rating_id} onChange={handleInputChange}>
+                            <option value="">Select a Rating</option>
+                            {ratings.map(rating => (
+                                <option key={rating.id} value={rating.id}>{rating.classification}</option>
                             ))}
                         </Form.Control>
                     </Form.Group>

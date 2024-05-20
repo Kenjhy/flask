@@ -22,7 +22,8 @@ class Company(db.Model):
     state = db.relationship('State')
     online_view = db.Column(db.String(50))
     on_site_view = db.Column(db.String(50))
-    calification = db.Column(db.Float)
+    rating_id = db.Column(db.Integer, db.ForeignKey('rating.id'), nullable=True)
+    rating = db.relationship('Rating')
     link = db.Column(db.String(200))
     details = db.Column(db.Text())
 
@@ -35,3 +36,10 @@ class State(db.Model):
 
     def __repr__(self):
         return f'<State {self.name}>'
+    
+class Rating(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    classification = db.Column(db.String(50), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Rating {self.classification}>'
