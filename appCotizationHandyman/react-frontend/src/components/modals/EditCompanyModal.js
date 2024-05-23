@@ -3,7 +3,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { updateCompany, getStates, getRatings } from '../../services/api';
 
 
-const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, updateCompanies  }) => {
+const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, updateCompanies }) => {
     const [formData, setFormData] = useState({ ...companyData });
     const [states, setStates] = useState([]);
     const [ratings, setRatings] = useState([]);
@@ -34,11 +34,27 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
         }
     }, [show, companyData]);
 
+    const formatCurrency = (value) => {
+        const numberValue = parseInt(value.replace(/[^0-9]/g, ''));
+        if (isNaN(numberValue)) return '';
+        return new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            minimumFractionDigits: 0
+        }).format(numberValue);
+    };
+
     const handleInputChange = (event) => {
         const { name, value } = event.target;
+        let formattedValue = value;
+
+        if (name === 'average_price' || name === 'final_price') {
+            formattedValue = formatCurrency(value);
+        }
+
         setFormData(prevState => ({
             ...prevState,
-            [name]: value
+            [name]: formattedValue
         }));
     };
 
@@ -58,6 +74,8 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
         event.preventDefault();
         updateCompany(companyData.id, {
             ...formData,
+            average_price: typeof formData.average_price === 'string' ? formData.average_price.replace(/[^0-9]/g, '') : formData.average_price,
+            final_price: typeof formData.final_price === 'string' ? formData.final_price.replace(/[^0-9]/g, '') : formData.final_price,
             image_base64: formData.image_base64 // Ensure image_base64 is sent
         })
         .then(response => {
@@ -87,14 +105,11 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                         { label: 'Date Start Works:', name: 'date_start_works', type: 'date' },
                         { label: 'Working Time:', name: 'working_time', type: 'number' },
                         { label: 'Meeting:', name: 'meeting', type: 'datetime-local' },
-                        { label: 'Average Price:', name: 'average_price', type: 'number' },
-                        { label: 'Final Price:', name: 'final_price', type: 'number' },
+                        { label: 'Average Price:', name: 'average_price', type: 'text' },
+                        { label: 'Final Price:', name: 'final_price', type: 'text' },
                         { label: 'Workplace:', name: 'workplace', type: 'text' },
                         { label: 'Methods of Payment:', name: 'methods_of_payment', type: 'text' },
                         { label: 'Work Method:', name: 'work_method', type: 'text' },
-                        { label: 'Quote:', name: 'quote', type: 'text' },
-                        { label: 'Online View:', name: 'online_view', type: 'text' },
-                        { label: 'On Site View:', name: 'on_site_view', type: 'text' },
                         { label: 'Link:', name: 'link', type: 'url' },
                         { label: 'Details:', name: 'details', type: 'textarea' }
                     ].map(field => (
@@ -111,6 +126,30 @@ const EditCompanyModal = ({ show, handleClose, companyData, refreshCompanies, up
                             />
                         </Form.Group>
                     ))}
+                    <Form.Group className="custom-form-group">
+                        <Form.Label>Quote</Form.Label>
+                        <Form.Control as="select" name="quote" value={formData.quote || ''} onChange={handleInputChange}>
+                            <option value="">Select an option</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </Form.Control>
+                    </Form.Group>
+                    <Form.Group className="custom-form-group">
+                        <Form.Label>Online View</Form.Label>
+                        <Form.Control as="select" name="online_view" value={formData.online_view || ''} onChange={handleInputChange}>
+                            <option value="">Select an option</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </Form.Control>
+                    </Form.Group>
+                    <Form.Group className="custom-form-group">
+                        <Form.Label>On Site View</Form.Label>
+                        <Form.Control as="select" name="on_site_view" value={formData.on_site_view || ''} onChange={handleInputChange}>
+                            <option value="">Select an option</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </Form.Control>
+                    </Form.Group>
                     <Form.Group className="custom-form-group">
                         <Form.Label>State</Form.Label>
                         <Form.Control as="select" name="state_id" value={formData.state_id || ''} onChange={handleInputChange}>

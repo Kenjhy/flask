@@ -13,6 +13,7 @@
     >>> db.create_all()
     >>> exit()
 - python -m database.init_db = El uso de -m hace que Python encuentre el módulo database.init_db correctamente en su contexto.
+- - python -m app.database.init_db
 - python run.py
 - pip install boto3
 - pip install awscli

@@ -14,10 +14,11 @@ migrate = Migrate(app, db)
 
 # Delay the import of route blueprints and schema initialization
 def register_blueprints():
-    from app.routes import company_bp, state_bp, rating_bp
+    from app.routes import company_bp, state_bp, rating_bp, report_bp
     app.register_blueprint(company_bp, url_prefix='/api')
     app.register_blueprint(state_bp, url_prefix='/api')
     app.register_blueprint(rating_bp, url_prefix='/api')
+    app.register_blueprint(report_bp, url_prefix='/api')
 
 def initialize_schemas():
     from app.schemas import init_app

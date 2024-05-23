@@ -53,7 +53,7 @@ def safe_float(value, default=None):
 
 @company_bp.route('/companies', methods=['GET'], strict_slashes=False)
 def get_companies():
-    companies = Company.query.all()
+    companies = Company.query.order_by(Company.id).all()
     return jsonify(companies_schema.dump(companies))
 
 @company_bp.route('/companies', methods=['POST'], strict_slashes=False)
@@ -182,8 +182,8 @@ def handle_company(id):
         company.date_start_works = parse_date(data.get('date_start_works'))
         company.working_time = int(data['working_time']) if data.get('working_time') is not None else company.working_time
         company.meeting = parse_datetime(data.get('meeting'))
-        company.average_price = float(data['average_price']) if data.get('average_price') is not None else company.average_price
-        company.final_price = float(data['final_price']) if data.get('final_price') is not None else company.final_price
+        company.average_price = float(data['average_price']) if data.get('average_price') else company.average_price
+        company.final_price = float(data['final_price']) if data.get('final_price') else company.final_price
         company.workplace = data.get('workplace', company.workplace)
         company.methods_of_payment = data.get('methods_of_payment', company.methods_of_payment)
         company.work_method = data.get('work_method', company.work_method)
@@ -217,7 +217,7 @@ def handle_company(id):
         return jsonify(company_schema.dump(company))
     elif request.method == 'DELETE':
         if not company:
-            logging.info("Attempt todelete  non-exixtent company with ID: {id}")
+            logging.info("Attempt to delete  non-existent company with ID: {id}")
             return jsonify({'message': 'Company not found'}), 404
         
         try:    
@@ -229,7 +229,7 @@ def handle_company(id):
             db.session.rollback() # Rollback the session in case of an error
             logging.error(f"Failed to delete Company with {id}: {str(e)}")
             return jsonify({'error': 'Failed to delete company', 'details': str(e)}), 500 
-    
+
 
 @company_bp.route('/company_routes/soft_delete/<int:id>', methods=['DELETE'], strict_slashes=False)
 def soft_delete_company(id):

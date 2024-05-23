@@ -6,8 +6,13 @@
 - npm install bootstrap
 - npm install react-bootstrap
 - Remove-Item -Path node_modules, package-lock.json -Recurse -Force
-
-
+- npm install react-router-dom recharts
+- npm install recharts
+- - https://recharts.org/en-US/examples/SimpleScatterChart
+- npm install react-table
+- npm install match-sorter
+- npm install react-icons --save
+-  
 
 
 # Documentation guide
@@ -18,6 +23,7 @@
 - https://create-react-app.dev/docs/getting-started
 - https://legacy.reactjs.org/docs/getting-started.html
 - https://react.dev/learn/start-a-new-react-project
+- 
 
 # Structure 
 

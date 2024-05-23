@@ -16,10 +16,12 @@
   display: flex;
   justify-content: flex-start; /* Aligns logo to the left */
   padding: 10px 20px; /* Padding inside the header */
+  position: relative; /* Add this to position the dropdown menu relative to the header */
 }
 
 .App-logo {
   height: 40px; /* Fixed smaller size for the logo */
+  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -31,6 +33,16 @@
 .table-responsive {
   width: 100%; /* Full width */
   overflow-x: auto; /* Enable horizontal scrolling */
+  margin-top: 30px; /* Adjust based on the fixed button's position */
+}
+
+.fixed-button-container {
+  position: fixed;
+  top: 80px; /* Ajustar según tu diseño */
+  right: 20px; /* Ajustar según tu diseño */
+  z-index: 1000; /* Asegurar que esté encima de otros elementos */
+  display: flex;
+  align-items: center; /* Alinear el botón y el input de búsqueda horizontalmente */
 }
 
 table {
@@ -74,4 +86,40 @@ table {
 
 .col-xlarge {
   width: 300px; /* Extra large for detailed descriptions or links */
+}
+
+/* MENU */
+
+/* Add the CSS for the menu dropdown */
+.App-header .dropdown-menu {
+  position: absolute;
+  top: 60px; /* Adjust according to the height of the header */
+  left: 20px; /* Adjust according to the position of the logo */
+  background-color: #1e5e7b;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure it is above other elements */
+  display: block !important; /* Ensure it is displayed */
+  border: 1px solid rgb(255, 255, 255); /* Temporary border for debugging */
+}
+
+.dropdown-item {
+  padding: 10px 20px;
+  text-decoration: none;
+  color: black;
+  display: block;
+}
+
+.dropdown-item:hover {
+  background-color: #c0d7e4 !important;
+}
+
+/* Report container styling */
+.report-container {
+  width: 100%;
+  max-width: 1200px; /* Adjust based on your layout */
+  margin: 0 auto; /* Center the container */
+  padding: 20px; /* Padding for spacing */
+  overflow: auto; /* Ensure container can scroll if content overflows */
 }
