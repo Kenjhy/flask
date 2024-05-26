@@ -1,3 +1,9 @@
+import os
+import boto3
+import base64
+import re
+import logging
+
 from flask import request, jsonify
 from app import db
 # from app.models import Company, State, Rating
@@ -6,10 +12,6 @@ from app.models.state_model import State
 from app.models.rating_model import Rating
 # from app.schemas import CompanySchema
 from app.schemas.company_schema import CompanySchema
-import boto3
-import base64
-import re
-import logging
 from io import BytesIO
 from datetime import datetime
 from . import company_bp
@@ -23,6 +25,7 @@ logging.basicConfig(level=logging.INFO)
 #Initialize SE client
 s3 = boto3.client('s3')
 
+BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
 """Safely parses a date string to a datetime object."""
 def parse_date(date_str):
@@ -83,12 +86,12 @@ def add_company():
             # Upload the file to s3
             s3.upload_fileobj(
                 BytesIO(image_data), 
-                'cuotization-handyman-mgs', 
+                BUCKET_NAME, 
                 image_key,
                 ExtraArgs={'ContentType': content_type.replace('data:', '')}
             )
             # Construct the image URL
-            image_url = f"https://cuotization-handyman-mgs.s3.amazonaws.com/{image_key}"
+            image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{image_key}"
         except Exception as e:
             logging.error("Failed to process image: %s", e)
             return jsonify({"error": "Failed to process the image.", "details": str(e)}), 500
@@ -161,14 +164,19 @@ def handle_company(id):
                 content_type_header, encoded = image_base64.split(';base64,')
                 image_data = base64.b64decode(encoded)
                 image_type = re.search(r'image/(.+)', content_type_header).group(1)
-                image_key = f"images/{data['company_name']}.{image_type}"
+                new_image_key = f"images/{data['company_name']}.{image_type}"
+                # Delete the old image if the key has changed
+                if company.image_path and new_image_key != company.image_path.split(f"{BUCKET_NAME}.s3.amazonaws.com/")[1]:
+                    old_image_key = company.image_path.split(f"{BUCKET_NAME}.s3.amazonaws.com/")[1]
+                    s3.delete_object(Bucket=BUCKET_NAME, Key=old_image_key)
+
                 s3.upload_fileobj(
                     BytesIO(image_data),
-                    'cuotization-handyman-mgs', 
-                    image_key,
+                    BUCKET_NAME,
+                    new_image_key,
                     ExtraArgs={'ContentType': content_type_header.replace('data:', '')},
                 )
-                company.image_path = f"https://cuotization-handyman-mgs.s3.amazonaws.com/{image_key}"
+                company.image_path = f"https://{BUCKET_NAME}.s3.amazonaws.com/{new_image_key}"
             except Exception as e:
                 logging.error("Failed to update image: %s", e)
                 return jsonify({"error": "Failed to update the image.", "details": str(e)}), 500
@@ -220,7 +228,18 @@ def handle_company(id):
             logging.info("Attempt to delete  non-existent company with ID: {id}")
             return jsonify({'message': 'Company not found'}), 404
         
-        try:    
+        try:
+             # Delete the image from S3
+             # Delete the image from S3
+            if company.image_path:
+                image_key_parts = company.image_path.split(f"{BUCKET_NAME}.s3.amazonaws.com/")
+                if len(image_key_parts) == 2:
+                    image_key = image_key_parts[1]
+                    s3.delete_object(Bucket=BUCKET_NAME, Key=image_key)
+                else:
+                    logging.warning(f"Unexpected image path format: {company.image_path}")
+                    return jsonify({"error": "Failed to delete company", "details": "Unexpected image path format."}), 500
+                    
             db.session.delete(company)
             db.session.commit()
             logging.info(f"Company with {id} was successfully deleted.")

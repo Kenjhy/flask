@@ -1,7 +1,11 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+
+load_dotenv()  # Load the environment variables from the .env file
 
 app = Flask(__name__)
 

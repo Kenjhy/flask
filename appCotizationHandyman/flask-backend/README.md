@@ -28,6 +28,8 @@
 - - flask db init
 - - flask db migrate -m "Added state model"
 - - flask db upgrade
+- pip install python-dotenv
+
 
 
 
