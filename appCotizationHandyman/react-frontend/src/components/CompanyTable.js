@@ -6,6 +6,7 @@ import { getCompanies, deleteCompany } from '../services/api';
 import { useTable, useSortBy, useGlobalFilter } from 'react-table';
 import { FaInfoCircle } from 'react-icons/fa'; // Import the icon from react-icons
 import { matchSorter } from 'match-sorter';
+import { formatCurrencyStrToNum } from '../utils/currencyFormatter';
 
 
 const CompanyTable = () => {
@@ -56,14 +57,6 @@ const CompanyTable = () => {
         setShowDetailModal(true);
     };
 
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('es-CO', {
-            style: 'currency',
-            currency: 'COP',
-            minimumFractionDigits: 0
-        }).format(value);
-    };
-
     // Table Rows
     const data = useMemo(() => companies, [companies]);
 
@@ -84,8 +77,8 @@ const CompanyTable = () => {
         { Header: 'Date Start Works', accessor: 'date_start_works', className: 'col-medium' },
         { Header: 'Working Time', accessor: 'working_time', className: 'col-medium' },
         { Header: 'Meeting', accessor: 'meeting', className: 'col-medium' },
-        { Header: 'Average Price', accessor: 'average_price', className: 'col-medium', Cell: ({ cell: { value } }) => formatCurrency(value) },
-        { Header: 'Final Price', accessor: 'final_price', className: 'col-medium', Cell: ({ cell: { value } }) => formatCurrency(value) },
+        { Header: 'Average Price', accessor: 'average_price', className: 'col-medium', Cell: ({ cell: { value } }) => formatCurrencyStrToNum(value) },
+        { Header: 'Final Price', accessor: 'final_price', className: 'col-medium', Cell: ({ cell: { value } }) => formatCurrencyStrToNum(value) },
         { Header: 'Workplace', accessor: 'workplace', className: 'col-large' },
         { Header: 'Methods of Payment', accessor: 'methods_of_payment', className: 'col-medium' },
         { Header: 'Work Method', accessor: 'work_method', className: 'col-medium' },
@@ -181,7 +174,7 @@ const CompanyTable = () => {
                     value={globalFilter || ""}
                     onChange={e => setGlobalFilter(e.target.value)}
                     placeholder="Search..."
-                    style={{ marginLeft: '10px', padding: '5px' }}
+                    style={{ marginLeft: '10px', padding: '0px' }}
                 />
             </div>
             {showModal && 
@@ -206,7 +199,7 @@ const CompanyTable = () => {
                 />
             )}
             <div className="table-responsive">
-                <table {...getTableProps()} className="table table-hover table-striped table-bordered custom-table" style={{ tableLayout: 'fixed', width: '100%' }}>
+                <table {...getTableProps()} className="table table-hover table-striped table-bordered table-dark custom-table " style={{ tableLayout: 'fixed', width: '100%' }}>
                     <thead className="table-dark">
                         {headerGroups.map(headerGroup => (
                             <tr {...headerGroup.getHeaderGroupProps()}>

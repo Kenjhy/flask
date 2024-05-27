@@ -1,7 +1,3 @@
-import os
-import boto3
-import base64
-import re
 import logging
 
 from flask import request, jsonify
@@ -12,8 +8,9 @@ from app.models.state_model import State
 from app.models.rating_model import Rating
 # from app.schemas import CompanySchema
 from app.schemas.company_schema import CompanySchema
-from io import BytesIO
-from datetime import datetime
+from app.utils.s3_utils import upload_image_to_s3, delete_image_from_s3
+from app.utils.date_utils import parse_date, parse_datetime
+from app.utils.parsing_utils import safe_float
 from . import company_bp
 
 company_schema = CompanySchema()
@@ -21,38 +18,6 @@ companies_schema = CompanySchema(many=True)
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
-
-#Initialize SE client
-s3 = boto3.client('s3')
-
-BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-
-"""Safely parses a date string to a datetime object."""
-def parse_date(date_str):
-    if date_str is None:
-        return None
-    try:
-        return datetime.strptime(date_str, '%Y-%m-%d')
-    except ValueError:
-        return None
-    
-def parse_datetime(datetime_str):
-    """Safely parses a datetime string to a datetime object including time with timezone."""
-    if datetime_str is None:
-        return None
-    try:
-        # Parse the datetime string to include the timezone information if present
-        return datetime.fromisoformat(datetime_str)
-    except ValueError:
-        return None
-
-def safe_float(value, default=None):
-    """Try to convert a value to float. Return a default value if the conversion fails."""
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return default
-    
 
 @company_bp.route('/companies', methods=['GET'], strict_slashes=False)
 def get_companies():
@@ -68,49 +33,14 @@ def add_company():
     if not data.get('contact_name') or not data .get('phone'):
         return jsonify({"error": "Missing required fields: contact name and phone are required. "}), 400
     
-    
-
     # Handle image upload
-    image_url = None
-    image_base64 = data['image_base64']
-    if image_base64:
-        try:
-            # Extract content type and decode the image, deparate header from base64 content
-            content_type, encoded = image_base64.split(';base64,')
-            # Decode the base64 portion to bytes
-            image_data = base64.b64decode(encoded)
-            #Extract header image type
-            image_type = re.search(r'image/(.+)', content_type).group(1) # Extract the type of the image (e.g. jpg, png)
-            # Generate a fle name
-            image_key = f"images/{data['company_name']}.{image_type}"
-            # Upload the file to s3
-            s3.upload_fileobj(
-                BytesIO(image_data), 
-                BUCKET_NAME, 
-                image_key,
-                ExtraArgs={'ContentType': content_type.replace('data:', '')}
-            )
-            # Construct the image URL
-            image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{image_key}"
-        except Exception as e:
-            logging.error("Failed to process image: %s", e)
-            return jsonify({"error": "Failed to process the image.", "details": str(e)}), 500
-        
+    image_url = upload_image_to_s3(data.get('image_base64'), data.get('company_name'))
+    if data.get('image_base64') and not image_url:
+        return jsonify({"error": "Failed to process the image."}), 500
 
-    # Manejar el estado opcionalmente
-    state_id = None
-    if data.get('state_id'):
-        state = State.query.get(data['state_id'])
-        if not state:
-            return jsonify({"error": "Invalid state provided"}), 400
-        state_id = state.id
-
-    rating_id = None
-    if data.get('rating_id'):
-        rating = Rating.query.get(data['rating_id'])
-        if not rating:
-            return jsonify({"error": "Invalid rating provided"}), 400
-        rating_id = rating.id
+    # Handle state optionally
+    state_id = State.query.get(data.get('state_id')).id if data.get('state_id') else None
+    rating_id = Rating.query.get(data.get('rating_id')).id if data.get('rating_id') else None
     
     try:
     # Process other fields and create Company instance
@@ -158,29 +88,14 @@ def handle_company(id):
         # Update company details
         data = request.json
         # Handle image update if provided
-        image_base64 = data.get('image_base64')
-        if image_base64:
-            try: 
-                content_type_header, encoded = image_base64.split(';base64,')
-                image_data = base64.b64decode(encoded)
-                image_type = re.search(r'image/(.+)', content_type_header).group(1)
-                new_image_key = f"images/{data['company_name']}.{image_type}"
-                # Delete the old image if the key has changed
-                if company.image_path and new_image_key != company.image_path.split(f"{BUCKET_NAME}.s3.amazonaws.com/")[1]:
-                    old_image_key = company.image_path.split(f"{BUCKET_NAME}.s3.amazonaws.com/")[1]
-                    s3.delete_object(Bucket=BUCKET_NAME, Key=old_image_key)
-
-                s3.upload_fileobj(
-                    BytesIO(image_data),
-                    BUCKET_NAME,
-                    new_image_key,
-                    ExtraArgs={'ContentType': content_type_header.replace('data:', '')},
-                )
-                company.image_path = f"https://{BUCKET_NAME}.s3.amazonaws.com/{new_image_key}"
-            except Exception as e:
-                logging.error("Failed to update image: %s", e)
-                return jsonify({"error": "Failed to update the image.", "details": str(e)}), 500
-         
+        image_url = upload_image_to_s3(data.get('image_base64'), data.get('company_name'))
+        if data.get('image_base64') and not image_url:
+            return jsonify({"error": "Failed to process the image."}), 500
+        # Delete the old image if the key has changed
+        if image_url and company.image_path != image_url:
+            delete_image_from_s3(company.image_path)
+            company.image_path = image_url
+       
         # Update other fields
         company.company_name = data.get('company_name', company.company_name)
         company.contact_name = data.get('contact_name', company.contact_name)
@@ -197,27 +112,10 @@ def handle_company(id):
         company.work_method = data.get('work_method', company.work_method)
         company.quote = data.get('quote', company.quote)
         # Handle state update
-        state_id = data.get('state_id')
-        if state_id:
-            state = State.query.get(state_id)
-            if not state:
-                return jsonify({"error": "Invalid state provided"}), 400
-            company.state_id = state.id
-        else:
-            company.state_id = None  # Allow null state if no state_id is provided
-            
+        company.state_id = State.query.get(data.get('state_id')).id if data.get('state_id') else None # Allow null state if no state_id is provided
         company.online_view = data.get('online_view', company.online_view)
         company.on_site_view = data.get('on_site_view', company.on_site_view)
-
-        rating_id = data.get('rating_id')
-        if rating_id:
-            rating = Rating.query.get(rating_id)
-            if not rating:
-                return jsonify({"error": "Invalid rating provided"}), 400
-            company.rating_id = rating.id
-        else:
-            company.rating_id = None
-            
+        company.rating_id = Rating.query.get(data.get('rating_id')).id if data.get('rating_id') else None
         company.link = data.get('link', company.link)
         company.details = data.get('details', company.details)
 
@@ -229,25 +127,15 @@ def handle_company(id):
             return jsonify({'message': 'Company not found'}), 404
         
         try:
-             # Delete the image from S3
-             # Delete the image from S3
-            if company.image_path:
-                image_key_parts = company.image_path.split(f"{BUCKET_NAME}.s3.amazonaws.com/")
-                if len(image_key_parts) == 2:
-                    image_key = image_key_parts[1]
-                    s3.delete_object(Bucket=BUCKET_NAME, Key=image_key)
-                else:
-                    logging.warning(f"Unexpected image path format: {company.image_path}")
-                    return jsonify({"error": "Failed to delete company", "details": "Unexpected image path format."}), 500
-                    
+            delete_image_from_s3(company.image_path)
             db.session.delete(company)
             db.session.commit()
             logging.info(f"Company with {id} was successfully deleted.")
             return jsonify({'message': 'Company successfully deleted.'}), 200
         except Exception as e:
-            db.session.rollback() # Rollback the session in case of an error
+            db.session.rollback()
             logging.error(f"Failed to delete Company with {id}: {str(e)}")
-            return jsonify({'error': 'Failed to delete company', 'details': str(e)}), 500 
+            return jsonify({'error': 'Failed to delete company', 'details': str(e)}), 500
 
 
 @company_bp.route('/company_routes/soft_delete/<int:id>', methods=['DELETE'], strict_slashes=False)

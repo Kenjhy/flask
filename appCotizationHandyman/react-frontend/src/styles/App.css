@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  background-color: #282c34;
+  background-color: #31373e;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,11 +38,11 @@
 
 .fixed-button-container {
   position: fixed;
-  top: 80px; /* Ajustar según tu diseño */
-  right: 20px; /* Ajustar según tu diseño */
-  z-index: 1000; /* Asegurar que esté encima de otros elementos */
+  top: 80px; /* Fit according to your design */
+  right: 20px; /* Adjust according to your design */
+  z-index: 1000; /* Make sure it is on top of other elements */
   display: flex;
-  align-items: center; /* Alinear el botón y el input de búsqueda horizontalmente */
+  align-items: center; /* Align button and search input horizontally */
 }
 
 table {
@@ -57,6 +57,7 @@ table {
 .btn {
   font-size: 0.7rem; /* Smaller buttons */
   padding: 2px 5px; /* Smaller padding for buttons */
+  background-color: #3a6273
 }
 
 .App-link {
@@ -95,13 +96,12 @@ table {
   position: absolute;
   top: 60px; /* Adjust according to the height of the header */
   left: 20px; /* Adjust according to the position of the logo */
-  background-color: #1e5e7b;
-  border: 1px solid #ccc;
+  background-color: #3a6273;
+  border: 1px solid #9dafb9;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000; /* Ensure it is above other elements */
   display: block !important; /* Ensure it is displayed */
-  border: 1px solid rgb(255, 255, 255); /* Temporary border for debugging */
 }
 
 .dropdown-item {
@@ -109,6 +109,7 @@ table {
   text-decoration: none;
   color: black;
   display: block;
+  border-bottom: inherit;
 }
 
 .dropdown-item:hover {
@@ -122,4 +123,19 @@ table {
   margin: 0 auto; /* Center the container */
   padding: 20px; /* Padding for spacing */
   overflow: auto; /* Ensure container can scroll if content overflows */
+}
+
+/* Bootstrap */
+.table-dark {
+  --bs-table-hover-bg: #3a6273;
+}
+
+.btn-warning{
+  --bs-btn-color: white !important;
+}
+
+.custom-table th,
+.custom-table td {
+    vertical-align: middle; /* This will vertically center the content in cells */
+    text-align: center; /* This will horizontally centre the content in the cells */
 }

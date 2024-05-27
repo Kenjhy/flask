@@ -22,4 +22,24 @@ margin-bottom: 0px;
 .custom-form-group textarea {
 flex: 1;
 padding: 0.02rem 0.75rem;
+background-color: #31373e;
+color: white;
+}
+
+/* Estilo para los modales personalizados */
+.custom-modal .modal-content {
+    background-color: #282c34 !important;
+    color: white; /* Ajusta el color del texto para mejor visibilidad */
+}
+
+
+.custom-modal .modal-header, 
+.custom-modal .modal-footer {
+    border-color: #31373e !important; /* Ajusta el color del borde */
+    background-color: #31373e !important; /* Ajusta el color de fondo del header y footer */
+    color: white; /* Ajusta el color del texto */
+}
+
+.custom-modal .modal-header .close {
+    color: white; /* Ajusta el color del botón de cerrar */
 }
