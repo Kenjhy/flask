@@ -18,6 +18,7 @@ class Company(db.Model):
     methods_of_payment = db.Column(db.String(200))
     work_method = db.Column(db.String(100))
     quote = db.Column(db.String(50))
+    years_of_experience = db.Column(db.Integer)
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=True)
     state = db.relationship('State')
     online_view = db.Column(db.String(50))

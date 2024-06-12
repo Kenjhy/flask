@@ -27,6 +27,9 @@ const DetailModal = ({ show, handleClose, companyData }) => {
                     <strong>Skills:</strong> {companyData.skills}
                 </div>
                 <div>
+                    <strong>Creation date:</strong> {companyData.creation_date}
+                </div>
+                <div>
                     <strong>Date of Contact:</strong> {companyData.date_of_contact}
                 </div>
                 <div>
@@ -55,6 +58,9 @@ const DetailModal = ({ show, handleClose, companyData }) => {
                 </div>
                 <div>
                     <strong>Quote:</strong> {companyData.quote}
+                </div>
+                <div>
+                    <strong>Year of Experience:</strong> {companyData.years_of_experience}
                 </div>
                 <div>
                     <strong>State:</strong> {companyData.state ? companyData.state.name : 'N/A'}

@@ -22,6 +22,7 @@ const AddCompanyModal = ({ show, handleClose, refreshCompanies }) => {
         methods_of_payment: '',
         work_method: '',
         quote: '',
+        years_of_experience: '',
         state_id: '',
         online_view: '',
         on_site_view: '',

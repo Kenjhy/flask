@@ -4,9 +4,9 @@ import { Form } from 'react-bootstrap';
 export const FormFields = ({ formData, handleInputChange, handleImageChange, states, ratings }) => {
     const fields = [
         { label: 'Image:', name: 'image_base64', type: 'file', changeHandler: handleImageChange },
-        { label: 'Company Name:', name: 'company_name', type: 'text', required: true },
-        { label: 'Contact Name:', name: 'contact_name', type: 'text' },
-        { label: 'Phone:', name: 'phone', type: 'text' },
+        { label: 'Company Name:', name: 'company_name', type: 'text' },
+        { label: 'Contact Name:', name: 'contact_name', type: 'text', required: true },
+        { label: 'Phone:', name: 'phone', type: 'text', required: true },
         { label: 'Skills:', name: 'skills', type: 'text' },
         { label: 'Date of Contact:', name: 'date_of_contact', type: 'date' },
         { label: 'Date Start Works:', name: 'date_start_works', type: 'date' },
@@ -17,6 +17,7 @@ export const FormFields = ({ formData, handleInputChange, handleImageChange, sta
         { label: 'Workplace:', name: 'workplace', type: 'text' },
         { label: 'Methods of Payment:', name: 'methods_of_payment', type: 'text' },
         { label: 'Work Method:', name: 'work_method', type: 'text' },
+        { label: 'Year of Experience:', name: 'years_of_experience', type: 'number'},
         { label: 'Link:', name: 'link', type: 'url' },
         { label: 'Details:', name: 'details', type: 'textarea' }
     ];

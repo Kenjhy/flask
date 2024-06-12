@@ -55,6 +55,11 @@ aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
 - https://base64.guru/converter/decode/image
 - 
 
+### Backup bd 
+- COPY company TO 'C:/Proyectos_software/Personal/Python/bk flask/bd/backup_company.csv' WITH CSV HEADER;
+- flask db migrate -m "Add years_of_experience to Company"
+- flask db upgrade
+
 ####  Step to Setting up AWS credentials
 
 - Step 1: Create or Obtain Access Keys

@@ -5,11 +5,11 @@ import re
 import logging
 from io import BytesIO
 
-#Initialize SE client
+#Initialize S3 client
 s3 = boto3.client('s3')
 BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
-def upload_image_to_s3(image_base64, company_name):
+def upload_image_to_s3(image_base64, company_name=None, contact_name=None):
     if image_base64:
         try:
             # Extract content type and decode the image, deparate header from base64 content
@@ -19,7 +19,7 @@ def upload_image_to_s3(image_base64, company_name):
             #Extract header image type
             image_type = re.search(r'image/(.+)', content_type).group(1)
             # Generate a fle name
-            image_key = f"images/{company_name}.{image_type}"
+            image_key = f"images/{company_name or contact_name}.{image_type}"
             # Upload the file to s3
             s3.upload_fileobj(
                 BytesIO(image_data), 

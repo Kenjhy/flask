@@ -30,11 +30,11 @@ def add_company():
     # Assume that the requst contains a JSON with the necessary data
     data = request.json
     #Validation for required fields
-    if not data.get('contact_name') or not data .get('phone'):
-        return jsonify({"error": "Missing required fields: contact name and phone are required. "}), 400
+    if not data.get('contact_name') or not data.get('phone'):
+        return jsonify({"error": "Missing required fields: contact name and phone are required."}), 400
     
     # Handle image upload
-    image_url = upload_image_to_s3(data.get('image_base64'), data.get('company_name'))
+    image_url = upload_image_to_s3(data.get('image_base64'), data.get('company_name'), data.get('contact_name'))
     if data.get('image_base64') and not image_url:
         return jsonify({"error": "Failed to process the image."}), 500
 
@@ -60,6 +60,7 @@ def add_company():
             methods_of_payment=data.get('methods_of_payment', ''),
             work_method=data.get('work_method', ''),
             quote=data.get('quote', ''),
+            years_of_experience=(data.get('years_of_experience', 0)) if data.get('years_of_experience') else None,
             state_id=state_id,
             online_view=data.get('online_view', ''),
             on_site_view=data.get('on_site_view', ''),
@@ -88,7 +89,7 @@ def handle_company(id):
         # Update company details
         data = request.json
         # Handle image update if provided
-        image_url = upload_image_to_s3(data.get('image_base64'), data.get('company_name'))
+        image_url = upload_image_to_s3(data.get('image_base64'), data.get('company_name'), data.get('contact_name'))
         if data.get('image_base64') and not image_url:
             return jsonify({"error": "Failed to process the image."}), 500
         # Delete the old image if the key has changed
@@ -111,7 +112,7 @@ def handle_company(id):
         company.methods_of_payment = data.get('methods_of_payment', company.methods_of_payment)
         company.work_method = data.get('work_method', company.work_method)
         company.quote = data.get('quote', company.quote)
-        # Handle state update
+        company.years_of_experience = int(data.get('years_of_experience', company.years_of_experience)) if data.get('years_of_experience') is not None else company.years_of_experience
         company.state_id = State.query.get(data.get('state_id')).id if data.get('state_id') else None # Allow null state if no state_id is provided
         company.online_view = data.get('online_view', company.online_view)
         company.on_site_view = data.get('on_site_view', company.on_site_view)
@@ -130,11 +131,11 @@ def handle_company(id):
             delete_image_from_s3(company.image_path)
             db.session.delete(company)
             db.session.commit()
-            logging.info(f"Company with {id} was successfully deleted.")
+            logging.info(f"Company with ID {id} was successfully deleted.")
             return jsonify({'message': 'Company successfully deleted.'}), 200
         except Exception as e:
             db.session.rollback()
-            logging.error(f"Failed to delete Company with {id}: {str(e)}")
+            logging.error(f"Failed to delete Company with ID {id}: {str(e)}")
             return jsonify({'error': 'Failed to delete company', 'details': str(e)}), 500
 
 

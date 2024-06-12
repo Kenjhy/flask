@@ -11,7 +11,8 @@ def get_report_data():
         {
             'contact_name': company.contact_name,
             'average_price': company.average_price,
-            'rating': int(company.rating.classification) if company.rating else 0
+            'rating': int(company.rating.classification) if company.rating else 0,
+            'years_of_experience': company.years_of_experience
         }
         for company in companies
     ]
